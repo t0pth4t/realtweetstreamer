@@ -37,9 +37,9 @@ module.exports = function (socket) {
 	var twit = "";
 	if(process.env.NODE_ENV === "production"){
 		twit = new twitter({
-			consumer_key= process.env.CONSUMER_KEY;
-    		consumer_secret= process.env.CONSUMER_SECRET;        
-    		access_token= process.env.ACCESS_TOKEN_KEY;       
+			consumer_key= process.env.CONSUMER_KEY,
+    		consumer_secret= process.env.CONSUMER_SECRET,        
+    		access_token= process.env.ACCESS_TOKEN_KEY,       
     		access_token_secret= process.env.ACCESS_TOKEN_SECRET
 		});
 
