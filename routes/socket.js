@@ -1,27 +1,26 @@
+'use strict';
 /*
  * Serve content over a socket
  */
-var moment = require('moment-timezone'),	
+var moment = require('moment-timezone'),
  cronJob = require('cron').CronJob,
  _ = require('lodash'),
  twitter = require('twit');
 
- if(process.env.NODE_ENV !== "production"){
- 	config = require('../config')
- }
+if(process.env.NODE_ENV !== 'production'){
+	var config = require('../config');
+}
 
 module.exports = function (socket) {
 	socket.on('error',function(err){
 		console.log('An error occurred : ' + err.stack);
 	});
-	socket.emit('data',watchList);
 
-    //var watchSymbols = ['node.js','nodeJX','angular.js', 'knockout.js', 'javascript','ember.js','socket.io','backbone.js','meteor.js','grunt.js','three.js','asm.js','express.js','underscore.js','spine.js','sproutcore','jquery','lodash.js','dojo.js','batman.js','can.js'];
 	var watchList = {
 		totalTweets: 0,
 		symbols: {},
 		recentTweets: {},
-		lastUpdated: "",
+		lastUpdated: '',
 		tweetsPerMinute: 0,
 		tpm: [],
 		trendingTweetsPerMinute: {},
@@ -29,18 +28,22 @@ module.exports = function (socket) {
 		minutes: []
 	};
 
+	socket.emit('data',watchList);
 
-	var twit = "";
-	if(process.env.NODE_ENV === "production"){
+    //var watchSymbols = ['node.js','nodeJX','angular.js', 'knockout.js', 'javascript','ember.js','socket.io','backbone.js','meteor.js','grunt.js','three.js','asm.js','express.js','underscore.js','spine.js','sproutcore','jquery','lodash.js','dojo.js','batman.js','can.js'];
+
+
+	var twit = '';
+	if(process.env.NODE_ENV === 'production'){
 		twit = new twitter({
 			consumer_key: process.env.CONSUMER_KEY,
-    		consumer_secret: process.env.CONSUMER_SECRET,        
-    		access_token: process.env.ACCESS_TOKEN_KEY,       
-    		access_token_secret: process.env.ACCESS_TOKEN_SECRET
+			consumer_secret: process.env.CONSUMER_SECRET,        
+			access_token: process.env.ACCESS_TOKEN_KEY,       
+			access_token_secret: process.env.ACCESS_TOKEN_SECRET
 		});
 
 	}else{		
-	 twit = new twitter(config);
+		 twit = new twitter(config);
 	}
 
 
@@ -49,10 +52,10 @@ twit.get('trends/place', {id: 2451822},function(err,data){
 	console.log(err);
 	console.log(JSON.stringify(data));
 	//var watchSymbols = _.map(data[0].trends, 'name');
-	var watchSymbols = _.map(data[0].trends, function(value){return value.name.toLowerCase();})
+	var watchSymbols = _.map(data[0].trends, function(value){return value.name.toLowerCase();});
 	console.log(watchSymbols);
     _.each(watchSymbols, function(value){
-		watchList.recentTweets[value] = "";
+		watchList.recentTweets[value] = '';
 		watchList.symbols[value] = 0;
 		watchList.trendingTweetsPerMinute[value] = [];
 		watchList.tweetsPerMinuteCounter[value] = 0;
@@ -102,7 +105,7 @@ var stream = twit.stream('statuses/filter', {track:watchSymbols, language:'en'})
 					watchList.symbols[value]++;
 					watchList.tweetsPerMinuteCounter[value]++;
 					watchList.totalTweets++;
-					watchList.recentTweets[value] =tweet.user.screen_name + ": " + tweet.text;
+					watchList.recentTweets[value] =tweet.user.screen_name + ': ' + tweet.text;
 					claimed = true;
 			}
 		
@@ -128,7 +131,7 @@ var stream = twit.stream('statuses/filter', {track:watchSymbols, language:'en'})
 	    //Clear out everything in the map
 	    _.each(watchSymbols, function(value) { 
 	    	watchList.symbols[value] = 0; 	    	
-	    	watchList.recentTweets[value] = "";
+	    	watchList.recentTweets[value] = '';
 	    });
 
 	    //Send the update to the clients

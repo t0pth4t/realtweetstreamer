@@ -23,8 +23,9 @@ angular.module('myApp.controllers', []).controller('AppCtrl', [
   'socket',
   function ($scope, socket) {
     socket.on('data', function (data) {
-      if (data === null)
+      if (data === null) {
         return;
+      }
       $scope.totalTweets = data.totalTweets;
       $scope.lastUpdated = data.lastUpdated;
       $scope.recentTweets = data.recentTweets;
@@ -53,20 +54,20 @@ angular.module('myApp.controllers', []).controller('AppCtrl', [
           pointStrokeColor: '#fff',
           data: data.tpm
         });
-        for (var val in data.symbols) {
+        for (var sym in data.symbols) {
           dataset.push({
             fillColor: 'rgba(0,40,89,0.5)',
             strokeColor: 'rgba(243,106,38,1)',
             pointColor: 'rgba(0,40,89,1)',
             pointStrokeColor: 'rgba(243,106,38,1)',
-            data: data.trendingTweetsPerMinute[val]
+            data: data.trendingTweetsPerMinute[sym]
           });
         }
         var graph = {
             labels: data.minutes,
             datasets: dataset
           };
-        var myNewChart = new Chart(ctx).Line(graph);
+        new Chart(ctx).Line(graph);
       }
     });
   }

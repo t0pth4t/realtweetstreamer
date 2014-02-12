@@ -12,18 +12,12 @@ module.exports = function(grunt){
         pkg: grunt.file.readJSON('package.json'),
 
         jshint:{
-        	options: {
-      curly: true,
-      eqeqeq: true,
-      eqnull: true,
-      browser: true,
-      globals: {
-        jQuery: true
-      },
-      files:{
-      	src: ['public/js/*.js','routes/*.js','app.js']
-      }
-    },
+
+			all:  ['public/js/*.js','routes/*.js','app.js'],
+			options:{
+				jshintrc:true
+			}
+
         },
 		ngmin:{
 			controllers:{
@@ -49,7 +43,7 @@ module.exports = function(grunt){
 		watch: {
 			scripts:{
 				files: ['public/js/*.js','public/css/app.css'],
-				tasks: ['jshint','ngmin','uglify','cssmin'],
+				tasks: ['ngmin','uglify','cssmin'],
 				options:{
 					spawn:false
 				}
