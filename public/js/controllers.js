@@ -41,11 +41,12 @@ angular.module('myApp.controllers', []).
             });
 
         for(var sym in data.symbols){
+
           dataset.push({
-              fillColor : 'rgba(0,40,89,0.5)',
-              strokeColor : 'rgba(243,106,38,1)',
-              pointColor : 'rgba(0,40,89,1)',
-              pointStrokeColor : 'rgba(243,106,38,1)',
+              fillColor : 'rgba(0,0,0,0.5)',
+              strokeColor : 'rgba(255,255,255,1)',
+              pointColor : 'rgba(0,0,0,1)',
+              pointStrokeColor : 'rgba(255,255,255,1)',
               data : data.trendingTweetsPerMinute[sym]
             });
         

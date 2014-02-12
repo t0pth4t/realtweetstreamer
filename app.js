@@ -1,11 +1,10 @@
-
+'use strict';
 /**
  * Module dependencies
  */
 
 var express = require('express'),
   routes = require('./routes'),
-  http = require('http'),
   path = require('path');
 
 var app = module.exports = express();
@@ -32,11 +31,6 @@ app.use(app.router);
 if (app.get('env') === 'development') {
   app.use(express.errorHandler());
 }
-
-// production only
-if (app.get('env') === 'production') {
-  // TODO
-};
 
 
 /**
