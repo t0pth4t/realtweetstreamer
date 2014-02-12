@@ -1,0 +1,21 @@
+<div class="row">	
+	<div class="col-md-12">
+	<h2 class="section">Last updated {{lastUpdated}}</h2>
+		<p>Twitter stream reader using Angular.js, Socket.io, and Node.js to read twitter streaming api and display a heat map based on the number of tweets which mention the symbol</p>
+			<h2 class="section">Total tweets: {{totalTweets}} Tweets Per Minute : {{tweetsPerMinute}}</h2>
+			<h3 style="color:#FFFFFF">Tweets Per Minute</h3>
+			<canvas id="myChart" width="800" height="400"></canvas>
+	</div>
+
+		
+
+	
+	<div ng-repeat="symbol in symbols | orderBy:predicate" class="col-md-4">
+		<div class="well" style="background:rgb({{symbol.value}},{{symbol.value}},{{symbol.value}});">
+			<h3>{{symbol.symbol}}</h3>
+			<span>{{symbol.recentTweet}}</span>
+		</div>
+	</div>
+
+
+</div>
