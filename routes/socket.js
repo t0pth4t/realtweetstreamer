@@ -4,8 +4,11 @@
 var moment = require('moment-timezone'),	
  cronJob = require('cron').CronJob,
  _ = require('lodash'),
- twitter = require('twit'),
- config = require('../config');
+ twitter = require('twit');
+
+ if(process.env.NODE_ENV !== "production"){
+ 	config = require('../config')
+ }
 
 module.exports = function (socket) {
 	socket.on('error',function(err){
@@ -31,7 +34,18 @@ module.exports = function (socket) {
 		watchList.symbols[value] = 0;
 	});
 
-	var twit = new twitter(config);
+	var twit = "";
+	if(process.env.NODE_ENV === "production"){
+		twit = new twitter({
+			consumer_key= process.env.CONSUMER_KEY;
+    		consumer_secret= process.env.CONSUMER_SECRET;        
+    		access_token= process.env.ACCESS_TOKEN_KEY;       
+    		access_token_secret= process.env.ACCESS_TOKEN_SECRET
+		});
+
+	}else{		
+	 twit = new twitter(config);
+	}
 
 
 var start = moment();
@@ -44,7 +58,8 @@ watchList.stpm.push(0);
 watchList.minutes.push(1);
 var minutes = 1;
 
-twit.get('trends/place', {id: 123424977},function(err,data){
+twit.get('trends/place', {id: 2451822},function(err,data){
+	console.log(err);
 	console.log(JSON.stringify(data));
 });
 
