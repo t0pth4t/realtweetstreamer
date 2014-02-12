@@ -45,31 +45,26 @@ angular.module('myApp.controllers', []).controller('AppCtrl', [
       if ($scope.minutesLength === undefined || data.minutes.length > $scope.minutesLength) {
         $scope.minutesLength = data.minutes.length;
         var ctx = $('#myChart').get(0).getContext('2d');
+        var dataset = [];
+        dataset.push({
+          fillColor: 'rgba(220,220,220,0.5)',
+          strokeColor: 'rgba(220,220,220,1)',
+          pointColor: 'rgba(220,220,220,1)',
+          pointStrokeColor: '#fff',
+          data: data.tpm
+        });
+        for (var val in data.symbols) {
+          dataset.push({
+            fillColor: 'rgba(0,40,89,0.5)',
+            strokeColor: 'rgba(243,106,38,1)',
+            pointColor: 'rgba(0,40,89,1)',
+            pointStrokeColor: 'rgba(243,106,38,1)',
+            data: data.trendingTweetsPerMinute[val]
+          });
+        }
         var graph = {
             labels: data.minutes,
-            datasets: [
-              {
-                fillColor: 'rgba(220,220,220,0.5)',
-                strokeColor: 'rgba(220,220,220,1)',
-                pointColor: 'rgba(220,220,220,1)',
-                pointStrokeColor: '#fff',
-                data: data.tpm
-              },
-              {
-                fillColor: 'rgba(0,40,89,0.5)',
-                strokeColor: 'rgba(243,106,38,1)',
-                pointColor: 'rgba(0,40,89,1)',
-                pointStrokeColor: 'rgba(243,106,38,1)',
-                data: data.btpm
-              },
-              {
-                fillColor: 'rgba(87,196,15,0.5)',
-                strokeColor: 'rgba(10,39,97,1)',
-                pointColor: 'rgba(87,196,15,1)',
-                pointStrokeColor: 'rgba(10,39,97,1)',
-                data: data.stpm
-              }
-            ]
+            datasets: dataset
           };
         var myNewChart = new Chart(ctx).Line(graph);
       }

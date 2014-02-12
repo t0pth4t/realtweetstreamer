@@ -11,7 +11,20 @@ module.exports = function(grunt){
    grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
-
+        jshint:{
+        	options: {
+      curly: true,
+      eqeqeq: true,
+      eqnull: true,
+      browser: true,
+      globals: {
+        jQuery: true
+      },
+      files:{
+      	src: ['public/js/*.js','routes/*.js','app.js']
+      }
+    },
+        },
 		ngmin:{
 			controllers:{
 				src: ['public/js/*.js'],
@@ -36,7 +49,7 @@ module.exports = function(grunt){
 		watch: {
 			scripts:{
 				files: ['public/js/*.js','public/css/app.css'],
-				tasks: ['ngmin','uglify','cssmin'],
+				tasks: ['jshint','ngmin','uglify','cssmin'],
 				options:{
 					spawn:false
 				}
@@ -46,5 +59,5 @@ module.exports = function(grunt){
 
 
 
-	grunt.registerTask('default', ['ngmin','uglify','cssmin']);
+	grunt.registerTask('default', ['jshint','ngmin','uglify','cssmin']);
 }

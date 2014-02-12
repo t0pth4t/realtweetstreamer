@@ -16,7 +16,7 @@ module.exports = function (socket) {
 	});
 	socket.emit('data',watchList);
 
-    var watchSymbols = ['node.js','nodeJX','angular.js', 'knockout.js', 'javascript','ember.js','socket.io','backbone.js','meteor.js','grunt.js','three.js','asm.js','express.js','underscore.js','spine.js','sproutcore','jquery','lodash.js','dojo.js','batman.js','can.js'];
+    //var watchSymbols = ['node.js','nodeJX','angular.js', 'knockout.js', 'javascript','ember.js','socket.io','backbone.js','meteor.js','grunt.js','three.js','asm.js','express.js','underscore.js','spine.js','sproutcore','jquery','lodash.js','dojo.js','batman.js','can.js'];
 	var watchList = {
 		totalTweets: 0,
 		symbols: {},
@@ -24,15 +24,11 @@ module.exports = function (socket) {
 		lastUpdated: "",
 		tweetsPerMinute: 0,
 		tpm: [],
-		btpm:[],
-		stpm:[],
+		trendingTweetsPerMinute: {},
+		tweetsPerMinuteCounter: {},
 		minutes: []
 	};
 
-	_.each(watchSymbols, function(value){
-		watchList.recentTweets[value] = "";
-		watchList.symbols[value] = 0;
-	});
 
 	var twit = "";
 	if(process.env.NODE_ENV === "production"){
@@ -48,23 +44,32 @@ module.exports = function (socket) {
 	}
 
 
-var start = moment();
-var tweetsPerMinute = 0;
-var btpm = 0;
-var stpm = 0;
-watchList.tpm.push(0);
-watchList.btpm.push(0);
-watchList.stpm.push(0);
-watchList.minutes.push(1);
-var minutes = 1;
 
 twit.get('trends/place', {id: 2451822},function(err,data){
 	console.log(err);
 	console.log(JSON.stringify(data));
-});
+	//var watchSymbols = _.map(data[0].trends, 'name');
+	var watchSymbols = _.map(data[0].trends, function(value){return value.name.toLowerCase();})
+	console.log(watchSymbols);
+    _.each(watchSymbols, function(value){
+		watchList.recentTweets[value] = "";
+		watchList.symbols[value] = 0;
+		watchList.trendingTweetsPerMinute[value] = [];
+		watchList.tweetsPerMinuteCounter[value] = 0;
+	});
+
+
+var start = moment();
+var tweetsPerMinute = 0;
+
+watchList.tpm.push(0);
+
+watchList.minutes.push(0);
+var minutes = 0;
 
 var stream = twit.stream('statuses/filter', {track:watchSymbols, language:'en'});
 	stream.on('tweet',function(tweet){
+	
 		watchList.lastUpdated = moment().tz('America/Chicago').format('MMMM Do YYYY, h:mm:ss a');
 		var claimed = false;
 
@@ -80,33 +85,25 @@ var stream = twit.stream('statuses/filter', {track:watchSymbols, language:'en'})
 			watchList.tweetsPerMinute = tweetsPerMinute;
 			watchList.tpm.push(tweetsPerMinute);
 			watchList.minutes.push(minutes++);
-			watchList.btpm.push(btpm);
-			watchList.stpm.push(stpm);
+			_.each(watchSymbols, function(value){
+				watchList.trendingTweetsPerMinute[value].push(watchList.tweetsPerMinuteCounter[value]);
+				watchList.tweetsPerMinuteCounter[value] = 0;						
+			});
 			tweetsPerMinute = 0;
-			btpm = 0;
-			stpm = 0;
+
 		}
 
 		var text = tweet.text.toLowerCase();
 
-		//_.each(watchSymbols, function(value){
+
 		for(var i = 0; i <watchSymbols.length; ++i){
-			var value = watchSymbols[i];
-			if(text.indexOf(value) !== -1 ){//|| text.indexOf(value.replace('.','')) !== -1){
-				
-			
+			var value = watchSymbols[i].toLowerCase();
+			if(text.indexOf(value) !== -1 ){				
 					watchList.symbols[value]++;
+					watchList.tweetsPerMinuteCounter[value]++;
 					watchList.totalTweets++;
 					watchList.recentTweets[value] =tweet.user.screen_name + ": " + tweet.text;
 					claimed = true;
-					if(value === 'broncos'){
-						btpm++;
-					}
-					else if(value === 'seahawks'){
-						stpm++;
-					}
-				
-
 			}
 		
 		};
@@ -115,6 +112,11 @@ var stream = twit.stream('statuses/filter', {track:watchSymbols, language:'en'})
 			socket.emit('data',watchList);
 		}
 	});
+});
+
+
+
+
 
 
 	//Reset everything on a new day!
