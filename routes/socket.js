@@ -4,7 +4,8 @@
 var moment = require('moment-timezone'),	
  cronJob = require('cron').CronJob,
  _ = require('lodash'),
- twitter = require('twitter');
+ twitter = require('twit'),
+ config = require('../config');
 
 module.exports = function (socket) {
 	socket.on('error',function(err){
@@ -30,12 +31,7 @@ module.exports = function (socket) {
 		watchList.symbols[value] = 0;
 	});
 
-	var twit = new twitter({
-	    consumer_key: '',           
-	    consumer_secret: '',        
-	    access_token_key: '',     
-	    access_token_secret: ''  
-	});
+	var twit = new twitter(config);
 
 
 var start = moment();
@@ -48,11 +44,12 @@ watchList.stpm.push(0);
 watchList.minutes.push(1);
 var minutes = 1;
 
-twit.getTrendsWithId(23424977, {}, function(trends){
-	console.log(JSON.stringify(trends));
+twit.get('trends/place', {id: 123424977},function(err,data){
+	console.log(JSON.stringify(data));
 });
-twit.stream('statuses/filter', {track:watchSymbols}, function(stream){
-	stream.on('data',function(tweet){
+
+var stream = twit.stream('statuses/filter', {track:watchSymbols, language:'en'});
+	stream.on('tweet',function(tweet){
 		watchList.lastUpdated = moment().tz('America/Chicago').format('MMMM Do YYYY, h:mm:ss a');
 		var claimed = false;
 
@@ -82,7 +79,7 @@ twit.stream('statuses/filter', {track:watchSymbols}, function(stream){
 			var value = watchSymbols[i];
 			if(text.indexOf(value) !== -1 ){//|| text.indexOf(value.replace('.','')) !== -1){
 				
-				if(tweet.lang === 'en'){
+			
 					watchList.symbols[value]++;
 					watchList.totalTweets++;
 					watchList.recentTweets[value] =tweet.user.screen_name + ": " + tweet.text;
@@ -93,7 +90,7 @@ twit.stream('statuses/filter', {track:watchSymbols}, function(stream){
 					else if(value === 'seahawks'){
 						stpm++;
 					}
-				}
+				
 
 			}
 		
@@ -103,7 +100,7 @@ twit.stream('statuses/filter', {track:watchSymbols}, function(stream){
 			socket.emit('data',watchList);
 		}
 	});
-});
+
 
 	//Reset everything on a new day!
 	//We don't want to keep data around from the previous day so reset everything.

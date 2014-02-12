@@ -11,7 +11,7 @@
     "moment-timezone": "latest",
     "lodash": "*",
     "cron": "*",
-    "twitter": "*"
+    "twit": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
